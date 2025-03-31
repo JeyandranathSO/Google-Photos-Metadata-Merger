@@ -31,17 +31,39 @@ def get_date_from_json(image_path):
         image_path.with_suffix('.png.json'),
         image_path.with_suffix('.gif.json'),
         image_path.with_suffix('.mp4.json'),
-        image_path.with_suffix('.bmp.json'),  # Added BMP
+        image_path.with_suffix('.mov.json'),
+        image_path.with_suffix('.heic.json'),
+        image_path.with_suffix('.bmp.json'),
+        image_path.with_suffix('.dng.json'),
         image_path.with_suffix('.json')
     ]
     
     # Also try looking for JSON with the original filename (without timestamp)
-    original_name = re.sub(r'^\d+_', '', image_path.name)  # Remove timestamp prefix if present
+    original_name = re.sub(r'^\d+_', '', image_path.name)
     original_path = image_path.with_name(original_name)
     possible_json_extensions.extend([
         original_path.with_suffix('.json'),
-        original_path.with_suffix('.bmp.json')  # For BMP files
+        original_path.with_suffix('.dng.json'),
+        original_path.with_suffix('.jpeg.json'),
+        original_path.with_suffix('.jpg.json')
     ])
+    
+    # Also check in the output folder for JSON files
+    output_dir = pathlib.Path("output")
+    if output_dir.exists():
+        output_json = output_dir / image_path.name
+        possible_json_extensions.extend([
+            output_json.with_suffix('.json'),
+            output_json.with_suffix('.jpg.json'),
+            output_json.with_suffix('.jpeg.json'),
+            output_json.with_suffix('.heic.json'),
+            output_json.with_suffix('.mp4.json'),
+            output_json.with_suffix('.mov.json'),
+            output_json.with_suffix('.png.json'),
+            output_json.with_suffix('.gif.json'),
+            output_json.with_suffix('.bmp.json'),
+            output_json.with_suffix('.dng.json')
+        ])
     
     for json_path in possible_json_extensions:
         if json_path.exists():
@@ -63,8 +85,8 @@ def get_date_taken(image_path):
     # First try to get date from EXIF data (only for formats that support EXIF)
     try:
         image = Image.open(image_path)
-        # Only try to get EXIF data for formats that support it (JPEG)
-        if image.format in ['JPEG', 'TIFF']:
+        # Only try to get EXIF data for formats that support it
+        if image.format in ['JPEG', 'TIFF', 'DNG'] or image_path.suffix.lower() in ['.jpg', '.jpeg', '.dng']:
             exif = image._getexif()
             if exif is not None:
                 for tag_id in exif:
@@ -95,7 +117,7 @@ def create_date_folders():
         return
     
     # Define supported file extensions (images and videos)
-    supported_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.mp4'}
+    supported_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.mp4', '.heic', '.mov', '.dng'}
     
     # Process each file in the output directory
     for file_path in output_dir.glob("*"):

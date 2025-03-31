@@ -126,10 +126,11 @@ def process_photos_and_json(photo_dir, json_dir, output_dir):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    file_extensions = ["*.jpg", "*.png", "*.gif", "*.heic", "*.mp4", "*.mov", "*.bmp"]
+    file_extensions = ["*.jpg", "*.png", "*.gif", "*.heic", "*.mp4", "*.mov", "*.bmp", "*.jpeg", "*.dng"]
     media_files = []
     for ext in file_extensions:
         media_files.extend(photo_dir.glob(ext))
+        print(f"Found {len(media_files)} files with extension {ext}")
     
     # Get JSON files from both source and output directories
     json_files = []
@@ -230,4 +231,4 @@ def process_photos_and_json(photo_dir, json_dir, output_dir):
             print(f"Error processing {media.name}: {str(e)}")
 
 # Example Usage
-process_photos_and_json("Photos from 2015", "Photos from 2015", "output")
+process_photos_and_json("Photos from 2024", "Photos from 2024", "output")
